@@ -17,8 +17,14 @@ gem 'uglifier', '>= 1.3.0'
 # Jobs adapter
 gem 'sidekiq'
 
+# requests library
+gem 'httparty'
+
 # Env variables
 gem "figaro"
+
+# organise logic via interactors
+gem 'interactor'
 
 # Admin interface
 gem 'activeadmin'
