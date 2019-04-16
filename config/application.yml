@@ -1,0 +1,4 @@
+# DON'T STORE ANY CREDENTIALS HERE. 
+# USE EDITOR=vim rails credentials:edit instead
+
+SIDEKIQ_REDIS_URL: "redis://localhost:6379"
