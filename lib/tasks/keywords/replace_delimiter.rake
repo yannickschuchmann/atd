@@ -11,7 +11,7 @@ namespace :keywords do
     }
 
     new_file = []
-    File.open(Rails.root.join("public", "small", "2016-11 Amazon Search Terms nov16.csv"), options) do |file|
+    File.open(Rails.root.join("2016-11 Amazon Search Terms nov16.csv"), options) do |file|
       new_file = file.each_line.map do |line, index|
         row = CSV.parse_line(line.scrub(""), options)
         row.to_csv(col_sep: ",")
