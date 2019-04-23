@@ -5,30 +5,19 @@ module Keywords
     def call
       context.fail!(error: "No date given") if context.date.blank?
       context.fail!(error: "No csv_file given") if context.csv_file.blank?
-      context.fail!(error: "No skip_header_lines given") if context.skip_header_lines.blank?
+      context.fail!(error: "No header_lines_to_skip given") if context.header_lines_to_skip.blank?
 
-      options = {encoding: "utf-8", liberal_parsing: true}
-      CSV.foreach(context.csv_file.path, options).with_index do |row, index|
-        next if index < context.skip_header_lines
-        
-        ActiveRecord::Base.transaction do
-          data = build_from_row(row, index - rank_correction_subtrahend)
-          keyword = Keyword.find_or_create_by(data[:keyword])
-          keyword.ranks.find_or_create_by(data[:keyword_rank])
+      options = {
+        encoding: "utf-8", 
+        liberal_parsing: true,
+        col_sep: ","
+      }
+      File.open(context.csv_file.path, options) do |file|
+        file.each_line.with_index do |line, index|
+          next if index < context.header_lines_to_skip
 
-          data[:products_ordered].each_with_index do |product_data|
-            product = Product.find_or_create_by(asin: product_data[:asin]) do |record|
-              record.title = product_data[:title]
-            end
-
-            ProductPerformance.find_or_create_by(
-              keyword: keyword, 
-              product: product, 
-              click_through_rate: product_data[:click_through_rate],
-              conversion_rate: product_data[:conversion_rate],
-              valued_at: product_data[:valued_at]
-            )
-          end
+          row = CSV.parse_line(line.scrub(""), options)
+          process_row(row, index)
         end
       end
     end
@@ -36,7 +25,29 @@ module Keywords
     private
 
     def rank_correction_subtrahend 
-      @rank_correction_subtrahend ||= (context.skip_header_lines || 1) - 1
+      @rank_correction_subtrahend ||= (context.header_lines_to_skip || 1) - 1
+    end
+
+    def process_row(row, index)
+      ActiveRecord::Base.transaction do
+        data = build_from_row(row, index - rank_correction_subtrahend)
+        keyword = Keyword.find_or_create_by(data[:keyword])
+        keyword.ranks.find_or_create_by(data[:keyword_rank])
+
+        data[:products].each do |product_data|
+          product = Product.find_or_create_by(asin: product_data[:asin]) do |record|
+            record.title = product_data[:title]
+          end
+
+          ProductPerformance.find_or_create_by(
+            keyword: keyword, 
+            product: product, 
+            click_through_rate: product_data[:click_through_rate],
+            conversion_rate: product_data[:conversion_rate],
+            valued_at: product_data[:valued_at]
+          )
+        end
+      end
     end
 
     def build_from_row(row, index)
@@ -47,23 +58,29 @@ module Keywords
         },
         keyword_rank: {
           position: index,
-          valued_at: Date.parse(context.date)
+          valued_at: context.date
         },
-        products_ordered: 3.times.map do |i|
+        products: 3.times.map do |i|
           offset = i * 4
+
+          asin = row[offset + 3]
+          next if asin.blank?
+
+          click_through_rate = align_separator(row[offset + 5])
+          conversion_rate = align_separator(row[offset + 6])
           {
             asin: row[offset + 3],
             title: row[offset + 4],
-            click_through_rate: BigDecimal.new(align_separator(row[offset + 5])),
-            conversion_rate: BigDecimal.new(align_separator(row[offset + 6])),
-            valued_at: Date.parse(context.date)
+            click_through_rate: (BigDecimal.new(click_through_rate) if click_through_rate.present?),
+            conversion_rate: (BigDecimal.new(conversion_rate) if conversion_rate.present?),
+            valued_at: context.date
           }
-        end
+        end.compact
       }
     end
 
     def align_separator(value)
-      value.gsub(',', '.')
+      value.gsub(',', '.') if value.present?
     end
   end
 end

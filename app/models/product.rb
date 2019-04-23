@@ -1,3 +1,3 @@
 class Product < ApplicationRecord
-  has_many :product_performances
+  has_many :product_performances, dependent: :destroy
 end

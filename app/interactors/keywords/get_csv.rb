@@ -7,8 +7,10 @@ module Keywords
 
       context.csv_file = File.open("/tmp/keywords_import_#{Time.now.to_i}.csv", "wb") do |f| 
         f.write HTTParty.get(context.url).body
+        f
       end
-    rescue
+    rescue => exception
+      puts exception
       context.fail!(error: "Couldn't fetch CSV file")
     end
   end

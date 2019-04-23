@@ -17,6 +17,9 @@ gem 'uglifier', '>= 1.3.0'
 # Jobs adapter
 gem 'sidekiq'
 
+# Error reporting
+gem "sentry-raven"
+
 # requests library
 gem 'httparty'
 

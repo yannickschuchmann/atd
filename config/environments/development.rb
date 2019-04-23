@@ -49,6 +49,8 @@ Rails.application.configure do
   # number of complex assets.
   config.assets.debug = true
 
+  config.action_controller.asset_host = 'http://localhost:3000'
+
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 
@@ -58,4 +60,8 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  Raven.configure do |config|
+    config.dsn = 'https://1c848032bc56496c92d8604ab32e88a8:76b201cdf83b473fbfa7afb165e5cd4f@sentry.io/1444706'
+  end
 end

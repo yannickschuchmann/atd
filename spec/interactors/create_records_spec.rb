@@ -7,7 +7,7 @@ describe Keywords::CreateRecords do
   let(:csv_file) { File.open(File.join(csv_path, csv_name), file_options)  }
   let(:csv_file_deprecated) { File.open(File.join(csv_path, csv_name_deprecated), file_options)  }
 
-  subject { described_class.call(csv_file: csv_file, date: '01/04/2017', skip_header_lines: 2) }
+  subject { described_class.call(csv_file: csv_file, date: '01/04/2017', header_lines_to_skip: 2) }
 
   describe '.call' do
     it 'is a success' do
@@ -17,7 +17,7 @@ describe Keywords::CreateRecords do
 
     context 'even when runs a second time' do
       subject { 2.times do 
-          described_class.call(csv_file: csv_file, date: '01/04/2017', skip_header_lines: 2) 
+          described_class.call(csv_file: csv_file, date: '01/04/2017', header_lines_to_skip: 2) 
         end
       }
 
