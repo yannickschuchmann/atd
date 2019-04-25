@@ -4,6 +4,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from '../app'
+import './app.css'
 
 // Render component with data
 document.addEventListener('DOMContentLoaded', () => {

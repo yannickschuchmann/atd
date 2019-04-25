@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import './app.css'
+import './index.css'
 import Routes from './routes'
 import { blue, indigo } from '@material-ui/core/colors'
 

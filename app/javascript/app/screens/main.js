@@ -1,8 +1,14 @@
 import React from 'react'
+import TopBar from '../components/topBar'
 
 class Main extends React.Component {
   render () {
-    return <div>furfm</div>
+    return (
+      <React.Fragment>
+        <TopBar />
+        <div>furfm</div>
+      </React.Fragment>
+    )
   }
 }
 
