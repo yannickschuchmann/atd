@@ -7,18 +7,23 @@ module Keywords
       context.fail!(error: "No csv_file given") if context.csv_file.blank?
       context.fail!(error: "No header_lines_to_skip given") if context.header_lines_to_skip.blank?
 
-      options = {
-        encoding: "utf-8", 
-        liberal_parsing: true,
-        col_sep: ","
-      }
-      File.open(context.csv_file.path, options) do |file|
+      begin
+        options = {
+          encoding: "utf-8", 
+          liberal_parsing: true,
+          col_sep: ","
+        }
+        file = context.csv_file
+        file.rewind
         file.each_line.with_index do |line, index|
           next if index < context.header_lines_to_skip
 
           row = CSV.parse_line(line.scrub(""), options)
           process_row(row, index)
         end
+      ensure
+        file.close
+        file.unlink
       end
     end
     
@@ -48,6 +53,11 @@ module Keywords
           )
         end
       end
+    rescue => exception
+      puts exception
+      puts "Error"
+      puts index
+      puts row
     end
 
     def build_from_row(row, index)
@@ -66,17 +76,23 @@ module Keywords
           asin = row[offset + 3]
           next if asin.blank?
 
-          click_through_rate = align_separator(row[offset + 5])
-          conversion_rate = align_separator(row[offset + 6])
+          click_through_rate = to_decimal(row[offset + 5])
+          conversion_rate = to_decimal(row[offset + 6])
           {
             asin: row[offset + 3],
             title: row[offset + 4],
-            click_through_rate: (BigDecimal.new(click_through_rate) if click_through_rate.present?),
-            conversion_rate: (BigDecimal.new(conversion_rate) if conversion_rate.present?),
+            click_through_rate: click_through_rate,
+            conversion_rate: click_through_rate,
             valued_at: context.date
           }
         end.compact
       }
+    end
+
+    def to_decimal(value)
+      BigDecimal.new(align_separator(value))
+    rescue
+      nil
     end
 
     def align_separator(value)

@@ -20,6 +20,9 @@ gem 'sidekiq'
 # Error reporting
 gem "sentry-raven"
 
+# Access for GDrive
+gem 'google-api-client', '~> 0.11'
+
 # requests library
 gem 'httparty'
 

@@ -17,6 +17,8 @@ module Atd
     # the framework and any gems in your application.
 
     config.eager_load_paths << Rails.root.join('lib')
+    config.eager_load_paths << Rails.root.join('app', 'services')
+    config.autoload_paths << Rails.root.join('app', 'services')
     config.active_job.queue_adapter = :sidekiq
   end
 end
