@@ -62,6 +62,6 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   Raven.configure do |config|
-    config.dsn = 'https://1c848032bc56496c92d8604ab32e88a8:76b201cdf83b473fbfa7afb165e5cd4f@sentry.io/1444706'
+    # config.dsn = 'https://1c848032bc56496c92d8604ab32e88a8:76b201cdf83b473fbfa7afb165e5cd4f@sentry.io/1444706'
   end
 end
